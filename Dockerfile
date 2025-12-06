@@ -24,11 +24,15 @@ RUN set -eux \
     upx \
     # 直接下载并构建 hugo（无需本地源代码）
     && git clone --depth 1 https://github.com/gohugoio/hugo . \
-    # 构建静态二进制文件
+    # 构建纯静态二进制文件（无CGO）
     # && CGO_ENABLED=1 go build \
-    && CGO_ENABLED=1 go build \
+    && CGO_ENABLED=0 go build \
+    -trimpath \
     -tags extended,netgo,osusergo \
-    -ldflags="-s -w -extldflags -static" \
+    -ldflags="-s -w -extldflags '-static' -linkmode=external" \
+    -gcflags="all=-trimpath=/app" \
+    -asmflags="all=-trimpath=/app" \
+    -buildmode=pie \
     -o $FILENAME \
     # 显示构建后的文件大小
     && echo "Binary size after build:" \
