@@ -43,7 +43,9 @@ RUN set -eux \
     && echo "Binary size after stripping:" \
     # && du -h $FILENAME \
     && du -b $FILENAME \
-    && upx --best --lzma $FILENAME \
+    # && upx --best --lzma $FILENAME \
+    # 极致压榨
+    && upx --ultra-brute $FILENAME \
     && echo "Binary size after upx:" \
     # && du -h $FILENAME \
     && du -b $FILENAME
