@@ -5,14 +5,15 @@
 # FROM golang:1.21-alpine AS builder
 FROM golang:alpine AS builder
 
-# 构建参数：指定生成的二进制文件名
-ARG FILENAME=hugo
+# # 构建参数：指定生成的二进制文件名
+# ARG FILENAME=hugo
 
 WORKDIR /app
 
 # 安装构建依赖（包括C++编译器和strip工具）
 # 使用--no-scripts禁用触发器执行，避免busybox触发器在arm64架构下的兼容性问题
 RUN set -eux \
+    && FILENAME=hugo \
     && apk add --no-cache --no-scripts --virtual .build-deps \
     gcc \
     g++ \
@@ -28,12 +29,10 @@ RUN set -eux \
     # && CGO_ENABLED=1 go build \
     && CGO_ENABLED=0 go build \
     -trimpath \
-    -tags extended,netgo,osusergo \
-    # -ldflags="-s -w -extldflags '-static' -linkmode=external" \
+    -tags netgo,osusergo \
     -ldflags="-s -w" \
     # -gcflags="all=-trimpath=/app" \
     # -asmflags="all=-trimpath=/app" \
-    -buildmode=pie \
     -o $FILENAME \
     # 显示构建后的文件大小
     && echo "Binary size after build:" \
